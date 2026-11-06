@@ -68,7 +68,9 @@ print(body["routing"]["resolved_model"])    # the concrete model that ran
 print(body["cost"]["compute_units"])        # CU charged for this call
 ```
 
-Note: `max_tokens` must be at least 16 for OpenAI models.
+Note: `max_tokens` must be at least 16 for OpenAI models. `mlpal-lite` routes to a reasoning
+model (`gpt-5-nano`) that spends tokens thinking before it answers: with a small budget (e.g. 32)
+it returns empty `content` with `finish_reason: "length"`. Give it 256 or more.
 
 ## 4. Anthropic Messages wire
 
@@ -98,6 +100,8 @@ with client.messages.stream(model="claude-haiku-5-5", max_tokens=256,
 
 ```bash
 pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ mlpal-assistants
+# with uv (its extra index would outrank the MLPal index and pick an older PyPI release):
+uv pip install --index https://pypi.mlpal.ai/simple/ mlpal-assistants
 ```
 
 ```python
