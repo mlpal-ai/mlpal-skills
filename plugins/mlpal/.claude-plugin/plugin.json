@@ -1,0 +1,10 @@
+{
+  "name": "mlpal",
+  "version": "0.1.0",
+  "description": "Skills for building on MLPal: the AI Gateway (OpenAI- and Anthropic-compatible), the Python SDK and the mlpal CLI.",
+  "author": { "name": "MLPal", "url": "https://mlpal.ai" },
+  "homepage": "https://github.com/mlpal-ai/mlpal-skills",
+  "repository": "https://github.com/mlpal-ai/mlpal-skills",
+  "license": "Apache-2.0",
+  "keywords": ["mlpal", "llm", "gateway", "openai", "anthropic", "sdk"]
+}

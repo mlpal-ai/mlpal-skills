@@ -1,0 +1,14 @@
+{
+  "name": "mlpal",
+  "owner": { "name": "MLPal", "url": "https://mlpal.ai" },
+  "metadata": { "description": "Official MLPal skills: use the MLPal AI Gateway, CLI and platform from any agent." },
+  "plugins": [
+    {
+      "name": "mlpal",
+      "source": "./plugins/mlpal",
+      "description": "Skills for building on MLPal: the AI Gateway (OpenAI- and Anthropic-compatible), the Python SDK and the mlpal CLI.",
+      "category": "development",
+      "homepage": "https://github.com/mlpal-ai/mlpal-skills"
+    }
+  ]
+}
