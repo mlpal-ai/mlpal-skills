@@ -6,7 +6,7 @@
     {
       "name": "mlpal",
       "source": "./plugins/mlpal",
-      "description": "Skills for building on MLPal: the AI Gateway (OpenAI- and Anthropic-compatible), the Python SDK and the mlpal CLI.",
+      "description": "Skills for building on MLPal: the AI Gateway, the Python SDK and the mlpal CLI.",
       "category": "development",
       "homepage": "https://github.com/mlpal-ai/mlpal-skills"
     }
