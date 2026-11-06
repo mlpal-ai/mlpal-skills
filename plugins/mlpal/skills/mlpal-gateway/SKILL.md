@@ -201,6 +201,11 @@ The summary returns `total_requests`, `total_input_tokens`,
 `quota_remaining` and a `by_model` breakdown. The dashboard shows the same
 under **Assistants → Usage**.
 
+Usage is deducted from your prepaid wallet a few minutes after each request,
+but it counts against your available balance straight away. When the available
+balance runs out, requests return `402 wallet_empty` until you top up; nothing
+is queued or retried for you.
+
 ## 10. Errors
 
 Errors are JSON with a stable `code` and a human `message`:
