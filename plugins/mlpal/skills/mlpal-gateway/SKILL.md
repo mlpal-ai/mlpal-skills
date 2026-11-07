@@ -167,6 +167,41 @@ image the gateway cannot yet pass on: the model is told the image was
 omitted and the session continues. Codex's `web_search` is dropped the same
 way. Sub-agent tools (Codex's `multi_agent_v1` namespace) work.
 
+**Reasoning state across turns (OpenAI reasoning models).** Ask for it with
+`include=["reasoning.encrypted_content"]` together with a `reasoning.effort`
+(verified on `gpt-5.4-mini` with `effort: "low"`): the response's `output`
+then starts with a `reasoning` item whose `encrypted_content` is the
+gateway's envelope `mlpal1.<backend>.<provider item id>.<blob>`. Replay the
+item exactly as the SDK returns it before the assistant turn it belongs to
+on the next call; the gateway unwraps it, forwards it to the backend that
+produced it, and the model continues its reasoning. Rules worth knowing:
+
+- Only OpenAI models. On any other model a replayed item with
+  `encrypted_content` is a 400 `reasoning_state_unsupported`; the same for
+  `include` on a non-OpenAI model, and on tenant connections (BYOK/BYOM).
+- Replay only what this gateway produced. An encrypted blob minted by OpenAI
+  directly (no envelope) is a 400 `invalid_request`; an envelope naming a
+  backend the model is not served on, or two backends in one input, is a
+  409 `reasoning_state_conflict`. None of these is retried by the SDK; every
+  message says: resend the input without the reasoning items to continue.
+- With an active `reasoning.effort`, OpenAI rejects `temperature` and
+  `top_p` on gpt-5.x, so the gateway omits them; if you set them explicitly,
+  `mlpal.metadata.sampling_ignored` says so.
+- Items with only a `summary` (what Codex CLI replays, since it never asks
+  for encrypted content) are accepted and dropped; Codex is unaffected.
+
+```python
+r1 = client.responses.create(model="gpt-5.4-mini", input="What is 17*23?",
+                             include=["reasoning.encrypted_content"],
+                             reasoning={"effort": "low"}, max_output_tokens=256)
+items = [o.model_dump(exclude_none=True) for o in r1.output]   # reasoning item first
+r2 = client.responses.create(model="gpt-5.4-mini",
+                             include=["reasoning.encrypted_content"],
+                             reasoning={"effort": "low"}, max_output_tokens=256,
+                             input=[{"role": "user", "content": "What is 17*23?"}, *items,
+                                    {"role": "user", "content": "Now add 1 to that."}])
+```
+
 ## 4. Anthropic Messages wire
 
 `POST /v1/messages` is a drop-in for the Anthropic SDK with Claude models:
