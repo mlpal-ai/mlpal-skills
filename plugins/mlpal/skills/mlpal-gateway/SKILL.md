@@ -1,6 +1,6 @@
 ---
 name: mlpal-gateway
-description: Use when calling LLMs through the MLPal AI Gateway: API keys, one base URL for the OpenAI SDK (chat, models, embeddings) and the Anthropic SDK (Messages), the Python SDK, model routing with model="mlpal", streaming, usage and billing in CU, errors.
+description: Use when calling LLMs through the MLPal AI Gateway: API keys, one base URL for the OpenAI SDK (chat, responses, models, embeddings) and the Anthropic SDK (Messages), pointing Codex CLI at MLPal, the Python SDK, model routing with model="mlpal", streaming, usage and billing in CU, errors.
 ---
 
 # MLPal AI Gateway
@@ -12,7 +12,7 @@ answers in the shape of the SDK you called it with:
 
 | SDK | `base_url` | paths |
 |---|---|---|
-| OpenAI (`openai`, any language) | `https://models.mlpal.ai/v1` | `chat.completions`, `models`, `embeddings` |
+| OpenAI (`openai`, any language) | `https://models.mlpal.ai/v1` | `chat.completions`, `responses`, `models`, `embeddings` |
 | Anthropic (`anthropic`) | `https://models.mlpal.ai` | `messages` (Claude; `/v2/messages` for any model) |
 | MLPal (`mlpal-assistants`) | default | both |
 
@@ -99,6 +99,73 @@ print(body["mlpal"]["cost"]["compute_units"])      # CU charged for this call
 Note: `max_tokens` must be at least 16 for OpenAI models. `mlpal-lite` routes to a reasoning
 model that may spend tokens thinking before it answers: give it 256 or more. Non-streaming calls
 are cut off with a `504 gateway_timeout` after 110 s; stream long generations.
+
+## 3a. The Responses API (`POST /v1/responses`) and Codex CLI
+
+The OpenAI SDKs' `responses.create`, `responses.stream` and `responses.parse`
+work against the same `base_url`, for every model the gateway serves. The
+response is OpenAI's `response` object plus the `mlpal` extra.
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ["MLPAL_API_KEY"], base_url="https://models.mlpal.ai/v1")
+r = client.responses.create(model="mlpal-lite", input="Say ok.", max_output_tokens=256)
+print(r.output_text, r.model_extra["mlpal"]["cost"]["compute_units"])
+
+with client.responses.stream(model="claude-haiku-5-5", input="Say ok.", max_output_tokens=256) as s:
+    for event in s:
+        if event.type == "response.output_text.delta":
+            print(event.delta, end="", flush=True)
+    final = s.get_final_response()   # usage + mlpal extra on response.completed
+```
+
+Supported: `input` as text or items (`message`, `function_call`,
+`function_call_output`, `input_image` by URL or data URL, `input_file` by
+inline `file_data`), `instructions`, function `tools` and `tool_choice`,
+`text.format` (`json_schema` / `json_object`; `responses.parse` with a
+Pydantic model works), `reasoning.effort`, `max_output_tokens`,
+`temperature`, `top_p`, `metadata`, `stream`.
+
+Stateless: the gateway stores nothing (and sends `store: false` upstream).
+`previous_response_id`, `store: true`, `background`, `conversation` and
+`GET /v1/responses/{id}` are refused with a typed 400 — send the full
+`input` each turn. Hosted tools (`web_search`, `file_search`,
+`code_interpreter`, `image_generation`, `mcp`, …) are not executed: they are
+dropped and listed in `mlpal.metadata.dropped`; function tools run as usual.
+A tool output that is only an image becomes the text
+"[image omitted: the gateway does not yet pass images in tool results]" so
+the conversation continues. Every client input error is a 400 with
+`error.param` naming the field, never a 5xx.
+
+**Codex CLI.** Point Codex at the gateway with a provider block in its
+`config.toml` (`~/.codex/config.toml`, or a separate `CODEX_HOME`):
+
+```toml
+model = "claude-haiku-5-5"
+model_provider = "mlpal"
+
+[model_providers.mlpal]
+name = "MLPal gateway"
+base_url = "https://models.mlpal.ai/v1"
+env_key = "MLPAL_API_KEY"
+wire_api = "responses"
+```
+
+```bash
+export MLPAL_API_KEY=mlpal_sk_...
+codex exec "Read names.txt with a shell command and count its lines."
+```
+
+Verified with Codex 0.144.5: shell commands through Codex's function tools,
+multi-turn with `codex exec resume --last`, on `claude-haiku-5-5`. For now
+use a non-GPT model name (`claude-*`, `gemini-*`, `mlpal-lite`); Codex
+prints "Model metadata for `<model>` not found. Defaulting to fallback
+metadata" for them, which is harmless. Codex's `view_image` tool returns an
+image the gateway cannot yet pass on: the model is told the image was
+omitted and the session continues. Codex's `web_search` is dropped the same
+way. Sub-agent tools (Codex's `multi_agent_v1` namespace) work.
 
 ## 4. Anthropic Messages wire
 
