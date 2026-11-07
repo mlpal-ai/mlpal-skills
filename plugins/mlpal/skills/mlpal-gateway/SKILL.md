@@ -1,6 +1,6 @@
 ---
 name: mlpal-gateway
-description: Use when calling LLMs through the MLPal AI Gateway: API keys, the chat and Anthropic-compatible Messages endpoints, OpenAI-compatible embeddings, the Python SDK, model routing with model="mlpal", streaming, embeddings, usage and billing in CU, errors.
+description: Use when calling LLMs through the MLPal AI Gateway: API keys, one base URL for the OpenAI SDK (chat, models, embeddings) and the Anthropic SDK (Messages), the Python SDK, model routing with model="mlpal", streaming, usage and billing in CU, errors.
 ---
 
 # MLPal AI Gateway
@@ -8,9 +8,15 @@ description: Use when calling LLMs through the MLPal AI Gateway: API keys, the c
 One API key, one base URL, every model MLPal serves (OpenAI, Anthropic, Google,
 open-weight models on Bedrock). The gateway resolves router tags such as
 `mlpal` to a concrete model, meters every request in compute units (CU), and
-returns the response in the shape of the wire you called.
+answers in the shape of the SDK you called it with:
 
-Base URL: `https://models.mlpal.ai`
+| SDK | `base_url` | paths |
+|---|---|---|
+| OpenAI (`openai`, any language) | `https://models.mlpal.ai/v1` | `chat.completions`, `models`, `embeddings` |
+| Anthropic (`anthropic`) | `https://models.mlpal.ai` | `messages` (Claude; `/v2/messages` for any model) |
+| MLPal (`mlpal-assistants`) | default | both |
+
+Plain HTTP works too; see section 3 for how the gateway tells the shapes apart.
 
 ## 1. Get an API key
 
@@ -35,17 +41,39 @@ also accepts it in `x-api-key`.
 Authorization: Bearer $MLPAL_API_KEY
 ```
 
-## 3. Chat with the OpenAI-style wire (curl and Python)
+## 3. Chat with the OpenAI SDK, curl or httpx
 
 `POST /v1/chat/completions` takes the OpenAI request shape (`model`,
-`messages`, `max_tokens`, `tools`, `response_format`). The response is the
-gateway's own flat shape: `content`, `role`, `finish_reason`, `tool_calls`,
-`cost`, `routing`. It is **not** `choices[]`, so read it with plain HTTP rather
-than the OpenAI SDK's chat client.
+`messages`, `max_tokens`, `tools`, `response_format`, `stream`) and answers
+with OpenAI's `chat.completion` (`choices[]`, `usage`) plus one extra field,
+`mlpal`, carrying what OpenAI's shape has no place for: `cost` (CU), `routing`
+(the concrete model a router tag resolved to), `data` (parsed structured
+output), `trace_id`. The OpenAI SDKs keep unknown fields, so nothing is lost.
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ["MLPAL_API_KEY"], base_url="https://models.mlpal.ai/v1")
+r = client.chat.completions.create(
+    model="mlpal", max_tokens=256,
+    messages=[{"role": "user", "content": "Say ok."}],
+)
+print(r.choices[0].message.content)                       # "Ok."
+extra = r.model_extra["mlpal"]
+print(extra["routing"]["resolved_model"], extra["cost"]["compute_units"])
+```
+
+The OpenAI SDKs identify themselves, so the gateway picks this shape for
+them automatically. Plain HTTP clients say which shape they want with one
+header: `X-MLPal-Wire: openai` for the shape above, `X-MLPal-Wire: mlpal`
+for the gateway's older flat shape (`content`, `cost`, `routing` at the top
+level). A request with neither header gets the flat shape today; that default
+moves to the OpenAI shape, so send the header.
 
 ```bash
 curl -s https://models.mlpal.ai/v1/chat/completions \
-  -H "Authorization: Bearer $MLPAL_API_KEY" \
+  -H "Authorization: Bearer $MLPAL_API_KEY" -H "X-MLPal-Wire: openai" \
   -H "content-type: application/json" \
   -d '{"model": "mlpal", "max_tokens": 256,
        "messages": [{"role": "user", "content": "Say ok."}]}'
@@ -56,21 +84,21 @@ import os, httpx
 
 r = httpx.post(
     "https://models.mlpal.ai/v1/chat/completions",
-    headers={"Authorization": f"Bearer {os.environ['MLPAL_API_KEY']}"},
+    headers={"Authorization": f"Bearer {os.environ['MLPAL_API_KEY']}", "X-MLPal-Wire": "openai"},
     json={"model": "mlpal", "max_tokens": 256,
           "messages": [{"role": "user", "content": "Say ok."}]},
     timeout=120,
 )
 r.raise_for_status()
 body = r.json()
-print(body["content"])                      # "Ok."
-print(body["routing"]["resolved_model"])    # the concrete model that ran
-print(body["cost"]["compute_units"])        # CU charged for this call
+print(body["choices"][0]["message"]["content"])   # "Ok."
+print(body["mlpal"]["routing"]["resolved_model"])  # the concrete model that ran
+print(body["mlpal"]["cost"]["compute_units"])      # CU charged for this call
 ```
 
 Note: `max_tokens` must be at least 16 for OpenAI models. `mlpal-lite` routes to a reasoning
-model (`gpt-5-nano`) that spends tokens thinking before it answers: with a small budget (e.g. 32)
-it returns empty `content` with `finish_reason: "length"`. Give it 256 or more.
+model that may spend tokens thinking before it answers: give it 256 or more. Non-streaming calls
+are cut off with a `504 gateway_timeout` after 110 s; stream long generations.
 
 ## 4. Anthropic Messages wire
 
@@ -99,9 +127,9 @@ with client.messages.stream(model="claude-haiku-5-5", max_tokens=256,
 ## 5. The official Python SDK (`mlpal-assistants`)
 
 ```bash
-pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ mlpal-assistants
+pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ "mlpal-assistants>=0.4.0"
 # with uv (its extra index would outrank the MLPal index and pick an older PyPI release):
-uv pip install --index https://pypi.mlpal.ai/simple/ mlpal-assistants
+uv pip install --index https://pypi.mlpal.ai/simple/ "mlpal-assistants>=0.4.0"
 ```
 
 ```python
@@ -118,8 +146,28 @@ print(msg.model)           # the concrete model that ran
 print(msg.compute_units)   # CU charged (pass-through cost, no markup)
 ```
 
-The SDK speaks the Anthropic Messages shape to every model, so one code path
-covers OpenAI, Google and open-weight models as well as Claude.
+`client.messages` speaks the Anthropic Messages shape to every model. The
+`Assistant` facade speaks the OpenAI shape and returns typed `cost` and
+`routing`; use 0.4.0 or later for it (0.3.x `stream_chat` returned nothing
+against the gateway):
+
+```python
+import asyncio
+from mlpal_assistants import Assistant
+
+async def main():
+    a = Assistant()  # reads MLPAL_API_KEY
+    r = await a.chat("Say ok.", model="mlpal-lite", max_tokens=256)
+    print(r.content, r.routing.resolved_model, r.cost.compute_units)
+    async with a.stream_chat([{"role": "user", "content": "Say ok."}], model="mlpal-lite", max_tokens=256) as s:
+        async for d in s:
+            print(d.content or "", end="", flush=True)
+            if d.cost:              # the final chunk carries the CU
+                print("\n", d.cost.compute_units)
+    await a.close()
+
+asyncio.run(main())
+```
 
 ## 6. Models and routing
 
@@ -137,15 +185,29 @@ Router tags pick a model for you and record the choice in `routing`:
 | tag | strategy | resolves to today |
 |---|---|---|
 | `mlpal` | best quality | `claude-opus-5-5` |
-| `mlpal-lite` | lowest cost | `gpt-5-nano` |
+| `mlpal-flash` | fastest | `gemini-3.8-flash` |
+| `mlpal-lite` | lowest cost | `gpt-6-luna` |
 
 Any concrete `model_tag` works too, for example `claude-haiku-5-5`,
 `text-embedding-3-small`.
 
 ## 7. Streaming
 
-The OpenAI-style wire streams on a separate path. The `stream: true` flag on
-`/v1/chat/completions` is ignored and returns one JSON body.
+With the OpenAI SDK, `stream=True` on `chat.completions.create` works as it
+does against OpenAI: `chat.completion.chunk` events, then `[DONE]`. Pass
+`stream_options={"include_usage": True}` to get the trailing usage chunk;
+without it, `usage` and the `mlpal` extra ride on the final chunk.
+
+```python
+with client.chat.completions.create(model="claude-haiku-5-5", max_tokens=256, stream=True,
+                                    messages=[{"role": "user", "content": "Say ok."}]) as s:
+    for chunk in s:
+        if chunk.choices and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+```
+
+Plain HTTP clients send `stream: true` with `X-MLPal-Wire: openai` for the same
+events, or use the gateway's own stream path, unchanged:
 
 ```bash
 curl -N https://models.mlpal.ai/v1/chat/completions/stream \
@@ -154,17 +216,15 @@ curl -N https://models.mlpal.ai/v1/chat/completions/stream \
        "messages": [{"role": "user", "content": "Say ok."}]}'
 ```
 
-Server-sent events, one JSON object per `data:` line:
-
 ```
 data: {"content": "ok", "done": false}
 data: {"content": "", "done": true, "finish_reason": "stop", "cost": {...}}
 data: [DONE]
 ```
 
-Concatenate `content` while `done` is false; the final event carries the
-`cost`. For Claude models the Anthropic SDK's `messages.stream` (section 4)
-also works unchanged.
+Streams send a `: ping` comment every 15 s while a model thinks; ignore it.
+For Claude models the Anthropic SDK's `messages.stream` (section 4) also
+works unchanged.
 
 ## 8. Embeddings
 
@@ -219,6 +279,12 @@ Errors are JSON with a stable `code` and a human `message`:
 | 403 | `model_access_denied` | this key's model policy excludes the model | pick an allowed model from `/v1/models` or adjust the key's policy |
 | 429 | rate limit | too many requests | back off exponentially and retry |
 | 400 | `url_rejected` | a URL in the request (file, image) was refused | use an allowed, public URL |
+| 413 | request too large | the body is over 128 MiB | send files by URL or trim inline media |
+| 504 | `gateway_timeout` | a non-streaming call ran past 110 s and was cancelled, nothing billed | stream the call, or retry with a smaller request |
+
+On the OpenAI shape the same errors arrive in OpenAI's envelope
+(`{"error": {"message", "type", "code"}}`) with the same `code`, so the SDK
+raises its usual `AuthenticationError`, `RateLimitError` and so on.
 
 Deprecated models stay listed with `is_deprecated: true` and a
 `deprecation_message`; move to the replacement before the date it names.
