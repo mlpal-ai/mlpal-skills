@@ -104,7 +104,13 @@ mlpal hops get-started coding          # make a catalog HOP usable in your scope
 mlpal hops list                        # catalog HOPs and your registrations
 mlpal hops chat <slug> "hi"            # one message to a published HOP
 mlpal hops keys --help                 # HOP keys (mlpal_hk_...)
+mlpal hops publications conversations list <publication-id>   # who talked to your published HOP (0.9.0+)
+mlpal hops publications conversations get <slug> <id>         # one conversation's state and spend
+mlpal hops publications conversations usage <slug> <id>       # its model CU
+mlpal hops publications conversations erase <slug> <id>       # delete its content for good
 ```
+
+`conversations erase` deletes an end customer's data and cannot be undone. It asks before it runs. If you are an assistant running the CLI for someone, never add `--yes` on your own: show them which conversation and whose it is, and let them confirm.
 
 ## Scripting
 
