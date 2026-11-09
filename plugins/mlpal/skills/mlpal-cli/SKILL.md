@@ -41,6 +41,10 @@ mlpal logout                   # revoke the session and delete what is stored
 
 ```bash
 mlpal wallet                   # balance, card on file, and what to do next
+mlpal wallet transactions      # top-ups, usage charges and credits, newest first (0.9.0+)
+mlpal wallet pricing           # price per CU, top-up limits, volume discounts (0.9.0+)
+mlpal wallet auto-reload       # whether it tops itself up, and by how much (0.9.0+)
+mlpal wallet card              # the card on file (0.9.0+)
 mlpal usage                    # compute units (CU) used, with the wallet
 mlpal usage cost               # CU and USD, per source
 mlpal usage by-model           # CU per model
