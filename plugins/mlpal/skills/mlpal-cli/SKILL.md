@@ -45,6 +45,7 @@ mlpal wallet transactions      # top-ups, usage charges and credits, newest firs
 mlpal wallet pricing           # price per CU, top-up limits, volume discounts (0.9.0+)
 mlpal wallet auto-reload       # whether it tops itself up, and by how much (0.9.0+)
 mlpal wallet card              # the card on file (0.9.0+)
+mlpal wallet top-up            # prints the billing page link; add --browser to open it (0.9.0+)
 mlpal usage                    # compute units (CU) used, with the wallet
 mlpal usage cost               # CU and USD, per source
 mlpal usage by-model           # CU per model
@@ -54,6 +55,8 @@ mlpal usage rate               # current CU price
 ```
 
 Managed MLPal uses a prepaid wallet measured in compute units (CU). A new account needs a verified card before gateway keys work. `mlpal wallet` tells you when that's the case and links to billing.
+
+The CLI never moves money. It cannot top up, add a card or change auto-reload: an assistant may be running the CLI on the user's behalf, and money actions need the person. Give the user the link from `mlpal wallet top-up` and let them finish in the browser.
 
 ## AI Gateway: keys and models
 
