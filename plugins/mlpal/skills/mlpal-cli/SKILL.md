@@ -129,9 +129,17 @@ These follow the same pattern; check `--help` on each:
 - `storage`
 - `secrets`
 - `db`: managed Postgres
-- `schedules`: run a HOP on a timetable
 - `org`
 - `projects`
 - `metrics`
+- `static-agents` (alias `sa`): create, deploy and talk to static agents
 
-`static-agents`, `da` and `sites` are listed under "Closed for now".
+Closed for now (listed under that heading in `mlpal --help`):
+- `schedules`: run a HOP on a timetable. Not open yet.
+- `sites`: invite-only.
+
+Retired in 0.9.0 (each prints its replacement and exits 2):
+- `da`: use `hops`.
+- `mcp cde`, `static-agents cde`, `assistants keys create-cde`: use `workspace`.
+- `mcp share`: give access with `mcp keys create <server-id>`.
+- `mcp templates use` and `mcp templates search`: use `mcp templates list`.
