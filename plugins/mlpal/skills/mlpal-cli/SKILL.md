@@ -167,7 +167,6 @@ Closed for now (listed under that heading in `mlpal --help`):
 - `sites`: invite-only. `mlpal sites access` says whether it is open for the account; `mlpal sites waitlist` asks for an invite (0.9.0+).
 
 Retired in 0.9.0 (each prints its replacement and exits 2):
-- `da`: use `hops`.
 - `mcp cde`, `static-agents cde`, `assistants keys create-cde`: use `workspace`.
 - `mcp share`: give access with `mcp keys create <server-id>`.
 - `mcp templates use` and `mcp templates search`: use `mcp templates list`.
