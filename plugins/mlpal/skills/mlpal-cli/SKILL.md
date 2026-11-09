@@ -164,7 +164,7 @@ These follow the same pattern; check `--help` on each:
 
 Closed for now (listed under that heading in `mlpal --help`):
 - `schedules`: run a HOP on a timetable. Not open yet.
-- `sites`: invite-only.
+- `sites`: invite-only. `mlpal sites access` says whether it is open for the account; `mlpal sites waitlist` asks for an invite (0.9.0+).
 
 Retired in 0.9.0 (each prints its replacement and exits 2):
 - `da`: use `hops`.
