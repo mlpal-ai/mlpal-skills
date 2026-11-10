@@ -1,0 +1,10 @@
+{
+  "name": "mlpal-memory",
+  "version": "0.1.0",
+  "description": "One memory across your coding tools: the MLPal memory MCP server, the session protocol skill, and an opt-in hook that loads the repo's workspace note at session start.",
+  "author": { "name": "MLPal", "url": "https://mlpal.ai" },
+  "homepage": "https://github.com/mlpal-ai/mlpal-skills",
+  "repository": "https://github.com/mlpal-ai/mlpal-skills",
+  "license": "Apache-2.0",
+  "keywords": ["mlpal", "memory", "mcp", "context", "claude-code", "codex"]
+}
