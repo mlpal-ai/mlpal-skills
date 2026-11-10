@@ -1,12 +1,24 @@
 {
   "name": "mlpal",
-  "owner": { "name": "MLPal", "url": "https://mlpal.ai" },
-  "metadata": { "description": "Official MLPal skills: use the MLPal AI Gateway, CLI and platform from any agent." },
+  "owner": {
+    "name": "MLPal",
+    "url": "https://mlpal.ai"
+  },
+  "metadata": {
+    "description": "Official MLPal skills: use the MLPal AI Gateway, CLI and platform from any agent."
+  },
   "plugins": [
     {
       "name": "mlpal",
       "source": "./plugins/mlpal",
       "description": "Skills for building on MLPal: the AI Gateway, the Python SDK and the mlpal CLI.",
+      "category": "development",
+      "homepage": "https://github.com/mlpal-ai/mlpal-skills"
+    },
+    {
+      "name": "mlpal-memory",
+      "source": "./plugins/mlpal-memory",
+      "description": "One memory across your coding tools: the MLPal memory MCP server, the session protocol skill, and an opt-in session-start hook.",
       "category": "development",
       "homepage": "https://github.com/mlpal-ai/mlpal-skills"
     }

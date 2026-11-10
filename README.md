@@ -9,6 +9,8 @@ These are official [Agent Skills](https://agentskills.io) for building on [MLPal
 
 This is one plugin, and we keep adding skills to it. To get new ones, run `/plugin marketplace update mlpal`.
 
+A second plugin, [`mlpal-memory`](plugins/mlpal-memory/README.md), gives your coding tools one shared memory on MLPal: the memory MCP server, the session protocol skill and an opt-in session-start hook. Install it with `/plugin install mlpal-memory@mlpal`.
+
 ## Install
 
 ### Claude Code
