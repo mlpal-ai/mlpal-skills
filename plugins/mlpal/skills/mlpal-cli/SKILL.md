@@ -11,7 +11,8 @@ description: Use when running the `mlpal` command-line tool. Covers installing i
 
 ```bash
 pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ mlpal-cli
-# or: uv tool install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ mlpal-cli
+# or, with uv (these exact flags: uv's --extra-index-url would look at pypi.org first and not find the CLI):
+uv tool install --index https://pypi.mlpal.ai/simple/ --default-index https://pypi.org/simple/ mlpal-cli
 mlpal --version
 ```
 

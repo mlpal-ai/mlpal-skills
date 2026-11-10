@@ -24,7 +24,7 @@ Dashboard: **Assistants → Keys → Create key**. Or with the CLI (0.8.4), whic
 writes the key straight into an env file and never shows it:
 
 ```bash
-uv tool install mlpal-cli --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/
+uv tool install --index https://pypi.mlpal.ai/simple/ --default-index https://pypi.org/simple/ mlpal-cli
 mlpal assistants keys create --name my-agent --env-file .env --env-var MLPAL_API_KEY
 ```
 
