@@ -19,10 +19,14 @@ One memory across your coding tools. This plugin gives Claude Code:
 Then connect once, which mints a memory-only key for this machine and never prints it:
 
 ```bash
-pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ mlpal-cli
+uv tool install --index-url https://pypi.mlpal.ai/simple/ "mlpal-cli>=0.9.3"   # or: pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ "mlpal-cli>=0.9.3"
 mlpal login
 mlpal memory connect claude-code
 ```
+
+`mlpal memory connect` adds the server only when none named `mlpal-memory` is configured; with this
+plugin installed it finds the plugin's server at the same URL and mints the key without adding a copy.
+The hook and the header helper need mlpal-cli 0.9.3 or later (`mlpal memory headers`, `mlpal memory notes`).
 
 Codex users: `mlpal memory connect codex` configures `~/.codex/config.toml`; copy the skill folder
 into `~/.codex/skills/`.
