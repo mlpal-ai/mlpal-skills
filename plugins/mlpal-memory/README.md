@@ -42,13 +42,15 @@ mlpal memory connect codex                 # mints the memory-only key for this 
 ```
 
 Codex reads `.codex-plugin/plugin.json`, whose MCP file (`codex.mcp.json`) names the same server with
-Codex's `http_headers_helper` running `mlpal memory headers --tool codex`, so reads and writes from
-Codex carry `X-MLPal-Client: codex`. The session-start hook is the same script with `--tool codex`;
-Codex asks you to trust it in `/hooks` before it runs. Codex IDE extension users keep
-`mlpal memory connect codex`, which configures the server in `~/.codex/config.toml`; a copied skill
-folder goes under `~/.agents/skills/`. Codex may list the plugin's server as
-`plugin:mlpal-memory:mlpal-memory`; mlpal-cli 0.9.3's `connect codex` then adds a second entry with the
-same URL, which is harmless, and 0.9.4 recognises the plugin's server.
+Codex's `http_headers_helper` running `mlpal memory headers --tool codex`, which prints the
+`Authorization` and `X-MLPal-Client: codex` headers for Codex to send, so reads and writes from Codex
+are attributed to Codex. The session-start hook is the same script with `--tool codex`; Codex asks you
+to trust it in `/hooks` before it runs. Codex IDE extension users keep `mlpal memory connect codex`,
+which configures the server in `~/.codex/config.toml`; a copied skill folder goes under
+`~/.agents/skills/`. With mlpal-cli 0.9.3, `connect codex` also adds its own `mlpal-memory` entry to
+`~/.codex/config.toml` beside the plugin's: redundant (the same tools twice, and its env-file bearer
+fails in a shell that has not sourced the file); remove it with `codex mcp remove mlpal-memory`.
+mlpal-cli 0.9.4 recognises the plugin's server and adds nothing.
 
 ## What it writes, and where
 

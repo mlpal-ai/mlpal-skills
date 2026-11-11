@@ -7,7 +7,7 @@
 tool="claude-code"
 while [ $# -gt 0 ]; do
   case "$1" in
-    --tool) tool="${2:-claude-code}"; shift 2 ;;
+    --tool) tool="${2:-claude-code}"; shift; [ $# -gt 0 ] && shift ;;
     *) shift ;;
   esac
 done
