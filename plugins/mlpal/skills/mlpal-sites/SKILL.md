@@ -35,7 +35,7 @@ mlpal sites create my-docs --kind static --spa  # --spa serves /index.html for e
 
 Otherwise it's **static**.
 
-A project with only a `Procfile` is also detected as a service, but **a Procfile isn't run**. Give it an `app.py`/`main.py` or an npm `start` script, or create the site with `--kind static`.
+**A Procfile isn't run.** From 0.9.5, a project whose only sign of a server is a `Procfile` is refused (exit 7, nothing created); older CLIs create it as a service that fails to start. Give it an `app.py`/`main.py` or an npm `start` script, or create the site with `--kind static`.
 
 **The slug:**
 - **Shape:** 3–40 characters of `a-z`, `0-9` and `-`, starting and ending with a letter or digit.
@@ -104,6 +104,7 @@ A deploy uploads, is checked, and goes live. The site's kind decides how.
 | 3 | **held for review** (static only). The site is unchanged until a person approves it. Common causes: a password form posting to another domain, or a lot of HTML (over 300 HTML/SVG/XML files, or one over 2 MB). Don't redeploy to get around it. |
 | 4 | refused for the account or payment: no invite, no verified card, wallet, or a suspended or held account |
 | 2 | bad usage, e.g. a malformed slug or `--no-promote` on a service site |
+| 7 | input the CLI refused itself, before calling the service, e.g. `create --kind auto` on a project with only a Procfile |
 | 69 | the service didn't answer; retry later |
 | 77 | a delegated session expired; sign in again |
 | 1 | anything else; the message says what |
