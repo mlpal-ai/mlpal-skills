@@ -31,8 +31,26 @@ be given as `--index` with pypi.org as `--default-index`, as above. The hook and
 adds the server only when none named `mlpal-memory` is configured; with 0.9.3 and this plugin installed
 it may add a second entry with the same URL, which is harmless, and 0.9.4 recognises the plugin's server.
 
-Codex users: `mlpal memory connect codex` configures `~/.codex/config.toml`; copy the skill folder
-into `~/.codex/skills/`.
+### Codex
+
+The same plugin installs in Codex (CLI and desktop app; the IDE extension has no plugins):
+
+```bash
+codex plugin marketplace add mlpal-ai/mlpal-skills
+codex plugin add mlpal-memory@mlpal        # or /plugins inside Codex
+mlpal memory connect codex                 # mints the memory-only key for this machine, never prints it
+```
+
+Codex reads `.codex-plugin/plugin.json`, whose MCP file (`codex.mcp.json`) names the same server with
+Codex's `http_headers_helper` running `mlpal memory headers --tool codex`, which prints the
+`Authorization` and `X-MLPal-Client: codex` headers for Codex to send, so reads and writes from Codex
+are attributed to Codex. The session-start hook is the same script with `--tool codex`; Codex asks you
+to trust it in `/hooks` before it runs. Codex IDE extension users keep `mlpal memory connect codex`,
+which configures the server in `~/.codex/config.toml`; a copied skill folder goes under
+`~/.agents/skills/`. With mlpal-cli 0.9.3, `connect codex` also adds its own `mlpal-memory` entry to
+`~/.codex/config.toml` beside the plugin's: redundant (the same tools twice, and its env-file bearer
+fails in a shell that has not sourced the file); remove it with `codex mcp remove mlpal-memory`.
+mlpal-cli 0.9.4 recognises the plugin's server and adds nothing.
 
 ## What it writes, and where
 
