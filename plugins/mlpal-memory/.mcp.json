@@ -3,7 +3,10 @@
     "mlpal-memory": {
       "type": "http",
       "url": "https://memory.mlpal.ai/mcp",
-      "headersHelper": "mlpal memory headers --tool claude-code"
+      "headers": {
+        "X-MLPal-Client": "claude-code"
+      },
+      "headersHelper": "PATH=\"$PATH:$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin\" mlpal memory headers"
     }
   }
 }
