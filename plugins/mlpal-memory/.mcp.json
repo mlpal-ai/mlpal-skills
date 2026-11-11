@@ -3,7 +3,10 @@
     "mlpal-memory": {
       "type": "http",
       "url": "https://memory.mlpal.ai/mcp",
-      "headersHelper": "mlpal memory headers --tool claude-code"
+      "headers": {
+        "X-MLPal-Client": "claude-code"
+      },
+      "headersHelper": "mlpal memory headers"
     }
   }
 }

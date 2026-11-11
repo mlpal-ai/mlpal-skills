@@ -19,40 +19,41 @@ One memory across your coding tools. This plugin gives Claude Code:
 Then connect once, which mints a memory-only key for this machine and never prints it:
 
 ```bash
-uv tool install --index https://pypi.mlpal.ai/simple/ --default-index https://pypi.org/simple/ 'mlpal-cli>=0.9.3'
-# or: pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ 'mlpal-cli>=0.9.3'
+uv tool install 'mlpal-cli>=0.9.4'     # or: pip install 'mlpal-cli>=0.9.4'
 mlpal login
-mlpal memory connect claude-code
+mlpal memory connect claude-code        # one memory key per machine, in the keyring, never printed
 ```
 
-The `>=0.9.3` pin matters: pypi.org carries a placeholder `mlpal-cli`, and with uv the MLPal index must
-be given as `--index` with pypi.org as `--default-index`, as above. The hook and the header helper need
-0.9.3 or later (`mlpal memory headers`, `mlpal memory notes`). `mlpal memory connect` mints the key and
-adds the server only when none named `mlpal-memory` is configured; with 0.9.3 and this plugin installed
-it may add a second entry with the same URL, which is harmless, and 0.9.4 recognises the plugin's server.
+The plugin's server entry names the tool statically (`X-MLPal-Client: claude-code`) and takes the
+`Authorization` header from `mlpal memory headers`, which reads the machine's device key; mlpal-cli 0.9.4
+or later is needed for that bare form (0.9.3 understood only `--tool`). With 0.9.4, `connect` sees the
+plugin's server and adds nothing of its own.
 
 ### Codex
 
-The same plugin installs in Codex (CLI and desktop app; the IDE extension has no plugins):
+The same plugin installs in Codex (CLI and desktop app; the IDE extension has no plugins). **Codex
+0.148.0 or later**: earlier versions accept the header helper setting and silently send no key.
 
 ```bash
 codex plugin marketplace add mlpal-ai/mlpal-skills
 codex plugin add mlpal-memory@mlpal        # or /plugins inside Codex
-mlpal memory connect codex                 # mints the memory-only key for this machine, never prints it
+mlpal memory connect codex                 # the same device key; adds nothing when the plugin is enabled
 ```
 
 Codex reads `.codex-plugin/plugin.json`, whose MCP file (`codex.mcp.json`) names the same server with
-Codex's `http_headers_helper` running `mlpal memory headers --tool codex`, which prints the
-`Authorization` and `X-MLPal-Client: codex` headers for Codex to send, so reads and writes from Codex
-are attributed to Codex. The session-start hook is the same script with `--tool codex`; Codex asks you
-to trust it in `/hooks` before it runs. Codex IDE extension users keep `mlpal memory connect codex`,
-which configures the server in `~/.codex/config.toml`; a copied skill folder goes under
-`~/.agents/skills/`. With mlpal-cli 0.9.3, `connect codex` also adds its own `mlpal-memory` entry to
-`~/.codex/config.toml` beside the plugin's: redundant (the same tools twice, and its env-file bearer
-fails in a shell that has not sourced the file); remove it with `codex mcp remove mlpal-memory`.
-mlpal-cli 0.9.4 recognises the plugin's server and adds nothing.
+`http_headers = {"X-MLPal-Client": "codex"}` and Codex's `http_headers_helper` running
+`mlpal memory headers`. The session-start hook is the same script with `--tool codex`; Codex asks you to
+trust it in `/hooks` before it runs. `codex exec` (non-interactive) refuses MCP writes unless run with
+`--approve-for-me`; reads need nothing. On Codex older than 0.148.0, and in the IDE extension,
+`mlpal memory connect codex` configures the server in `~/.codex/config.toml` with a key file that the
+shell must have loaded; a copied skill folder goes under `~/.agents/skills/`.
 
 ## What it writes, and where
+
+Writes land in your personal store, the tenant `user:<your id>`. A learning or a piece of state answers
+`scope: "org", scope_id: "user:<id>"`: that is the personal store's tenant-wide scope, not an
+organization. Preferences land at `scope: "user"`. Each row carries the tool that wrote it.
+
 
 Everything lands in your personal store on MLPal, named with the tool that wrote it. You see and edit
 the same memory on [mlpal.ai](https://mlpal.ai). A write that carries a credential is refused; writes

@@ -1,6 +1,6 @@
 {
   "name": "mlpal-memory",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "One memory across your coding tools: the MLPal memory MCP server, the session protocol skill, and an opt-in hook that loads the repo's workspace note at session start.",
   "keywords": [
     "mlpal",
