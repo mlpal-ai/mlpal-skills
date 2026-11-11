@@ -6,6 +6,7 @@ These are official [Agent Skills](https://agentskills.io) for building on [MLPal
 |---|---|
 | [`mlpal-gateway`](plugins/mlpal/skills/mlpal-gateway/SKILL.md) | The MLPal AI Gateway: API keys, the chat API, the Anthropic-compatible Messages API, OpenAI-compatible embeddings, the Python SDK, model routing (`model="mlpal"`), streaming, usage and costs in compute units, and errors |
 | [`mlpal-cli`](plugins/mlpal/skills/mlpal-cli/SKILL.md) | The `mlpal` CLI: install, sign in (browser, headless, profiles), the wallet and usage, gateway keys and models, the cloud workspace, HOPs, and scripting with JSON output and exit codes |
+| [`mlpal-sites`](plugins/mlpal/skills/mlpal-sites/SKILL.md) | MLPal Sites (invite-only): static sites and small web apps at `<slug>.mlpal.app`, deploys and review holds, rollbacks, custom domains, usage and billing, and scripting with exit codes |
 
 This is one plugin, and we keep adding skills to it. To get new ones, run `/plugin marketplace update mlpal`.
 

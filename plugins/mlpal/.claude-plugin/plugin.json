@@ -1,6 +1,6 @@
 {
   "name": "mlpal",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Skills for building on MLPal: the AI Gateway, the Python SDK and the mlpal CLI.",
   "author": { "name": "MLPal", "url": "https://mlpal.ai" },
   "homepage": "https://github.com/mlpal-ai/mlpal-skills",
