@@ -87,8 +87,8 @@ A deploy uploads, is checked, and goes live. The site's kind decides how.
 
 **At runtime:**
 - **Headers:** every request carries `X-Forwarded-Host`, the host the visitor used.
-- **Limits:** request bodies are limited to 10 MB, and a request times out after 120 s.
-- **Idle sleep:** a service sleeps when idle. The first request after that waits while it starts and installs its dependencies. That's about 10–15 s for a small app, longer with many dependencies.
+- **Limits:** request bodies are limited to 10 MB, and a response must start within 60 s.
+- **Idle sleep:** a service sleeps when idle. The first request after that waits while it starts and installs its dependencies. That's about 10–15 s for a small app, longer with many dependencies. If waking takes over 60 s, that first request fails with 504; retry it.
 - **Not reviewed:** service deploys go live when they finalize. They're never held for review, and `--no-promote` doesn't apply to them.
 
 ### Both kinds
@@ -127,7 +127,7 @@ mlpal sites update my-site --spa                  # or --no-spa
 mlpal sites status my-site
 ```
 
-A service site is rolled back by deploying the earlier code again. The live deploy and the 4 before it are kept; older ones are purged.
+A service site is rolled back by deploying the earlier code again. The live deploy and the 4 most recent other deploys are kept; older ones are purged.
 
 ## Custom domains
 
@@ -162,7 +162,7 @@ mlpal sites usage my-site --month 2026-11
 
 Storage, egress and requests are billed to your wallet in compute units. A service site's run time is billed too, separately: it isn't in this output. Egress is metered from the CDN logs, so usage trails traffic by several minutes.
 
-Each site has a monthly egress cap (100 GB by default). You're warned at 80%; past the cap, the site goes offline until the next month.
+Each site has a monthly egress cap (100 GB by default). Past the cap, the site goes offline until the next month.
 
 ## Delete
 
@@ -180,7 +180,7 @@ The site goes off the edge right away; visitors see "Site not found" within abou
 | 410 "disabled for violating the MLPal Acceptable Use Policy" | the site was taken down. Contact MLPal. |
 | 503 "temporarily unavailable" | the account is on hold or suspended, or the site hit its egress cap |
 | 405 / 400 (static) | a method other than GET or HEAD, or an invalid path |
-| 402 / 503 (service) | the owner's wallet can't start it, or the app failed to start (see the `/health` rule above) |
+| 402 / 502 / 503 / 504 (service) | the owner's wallet can't start it (402); the app isn't reachable, for example it listens on 127.0.0.1 (502); it failed to start (503, see the `/health` rule); or it didn't respond within 60 s (504) |
 
 ## Scripting
 
