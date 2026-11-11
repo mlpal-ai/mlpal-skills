@@ -49,8 +49,9 @@ Codex reads `.codex-plugin/plugin.json`, whose MCP file (`codex.mcp.json`) names
 `mlpal memory headers`. The session-start hook is the same script with `--tool codex`; Codex asks you to
 trust it in `/hooks` before it runs. `codex exec` (non-interactive) refuses MCP writes unless run with
 `--approve-for-me`; reads need nothing. On Codex older than 0.152.0, and in the IDE extension,
-`mlpal memory connect codex` configures the server in `~/.codex/config.toml` with a key file that the
-shell must have loaded; a copied skill folder goes under `~/.agents/skills/`.
+`mlpal memory connect codex` (mlpal-cli 0.9.5 or later for 0.148.0–0.151.0; 0.9.4 still treats those
+as helper-capable) configures the server in `~/.codex/config.toml` with a key file that the shell must
+have loaded; a copied skill folder goes under `~/.agents/skills/`.
 
 ## What it writes, and where
 
