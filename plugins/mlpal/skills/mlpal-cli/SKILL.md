@@ -196,7 +196,7 @@ These follow the same pattern; check `--help` on each:
 
 Closed for now (listed under that heading in `mlpal --help`):
 - `schedules`: run a HOP on a timetable. Not open yet.
-- `sites`: invite-only. `mlpal sites access` says whether it is open for the account; `mlpal sites waitlist` asks for an invite (0.9.0+).
+- `sites`: invite-only. `mlpal sites access` says whether it is open for the account; `mlpal sites waitlist` asks for an invite (0.9.0+). Once it's open, the `mlpal-sites` skill covers creating, deploying and running sites.
 
 Retired in 0.9.0 (each prints its replacement and exits 2):
 - `mcp cde`, `static-agents cde`, `assistants keys create-cde`: use `workspace`.
