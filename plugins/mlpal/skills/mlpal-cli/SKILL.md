@@ -154,7 +154,7 @@ mlpal memory keys revoke <id>
 
 - A machine has one memory key, which every coding tool on it uses. It can only read and write memory. `connect` makes it the first time, never a second one, and points the tool at `https://memory.mlpal.ai/mcp`. The key is never printed and never needs to be: the tool asks the CLI for it each time.
 - With the `mlpal-memory` plugin installed in the tool, the plugin brings the server and `connect` only makes sure the key exists.
-- Codex needs version 0.148.0 or later for this. For an older Codex, `connect codex` writes the key to a private file and prints a `source` line; say so to the person and suggest updating Codex.
+- Codex needs version 0.152.0 or later for this. For an older Codex, `connect codex` writes the key to a private file and prints a `source` line; say so to the person and suggest updating Codex.
 - `connect`, `keys rotate` and `keys revoke` change the person's tool configuration or keys. If you are an assistant running the CLI for someone, show them the command and let them confirm. Never read the key file or run `mlpal memory headers` yourself.
 - One key means one tool cannot be cut off alone: `keys rotate` replaces the key for all of them.
 - If it says Claude Code is "not connected yet", the `claude` command was not on PATH: run the `claude mcp add-json …` line it printed. If it says an MCP server named `mlpal-memory` already exists, that entry points somewhere else; the person decides whether to remove it.
