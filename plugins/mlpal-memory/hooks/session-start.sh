@@ -11,6 +11,9 @@ while [ $# -gt 0 ]; do
     *) shift ;;
   esac
 done
+# a GUI host (the ChatGPT desktop app, a desktop Claude) starts hooks with launchd's PATH: put the
+# usual CLI locations in front so the uv tool, Homebrew or /usr/local install of mlpal is found
+PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 command -v mlpal >/dev/null 2>&1 || exit 0
 workspace="$(basename "$PWD")"
 if command -v timeout >/dev/null 2>&1; then

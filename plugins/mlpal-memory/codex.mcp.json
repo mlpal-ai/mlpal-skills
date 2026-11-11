@@ -6,7 +6,7 @@
       "http_headers": {
         "X-MLPal-Client": "codex"
       },
-      "http_headers_helper": "mlpal memory headers"
+      "http_headers_helper": "PATH=\"$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH\" mlpal memory headers"
     }
   }
 }

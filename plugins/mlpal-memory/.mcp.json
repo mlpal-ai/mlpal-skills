@@ -6,7 +6,7 @@
       "headers": {
         "X-MLPal-Client": "claude-code"
       },
-      "headersHelper": "mlpal memory headers"
+      "headersHelper": "PATH=\"$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH\" mlpal memory headers"
     }
   }
 }

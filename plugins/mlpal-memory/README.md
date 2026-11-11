@@ -25,7 +25,11 @@ mlpal memory connect claude-code        # one memory key per machine, in the key
 ```
 
 The plugin's server entry names the tool statically (`X-MLPal-Client: claude-code`) and takes the
-`Authorization` header from `mlpal memory headers`, which reads the machine's device key. **mlpal-cli
+`Authorization` header from `mlpal memory headers`, which reads the machine's device key. The helper
+line puts `~/.local/bin`, `/opt/homebrew/bin` and `/usr/local/bin` in front of `PATH` first, because a
+desktop app (the ChatGPT app's Codex, a desktop Claude) starts helpers with the login-less PATH of a
+GUI process, where a `uv tool install` or Homebrew `mlpal` is otherwise not found and the server would
+be called without a key. **mlpal-cli
 0.9.4 or later is required** for that bare form: on 0.9.3 the command exits with "Missing option
 '--tool'", the server connects without a key and every call answers 401. Updating the plugin from 0.1.1
 means `uv tool upgrade mlpal-cli` (or `pip install -U mlpal-cli`) as well. With 0.9.4, `connect` sees
