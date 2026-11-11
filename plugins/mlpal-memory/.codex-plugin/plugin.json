@@ -1,0 +1,23 @@
+{
+  "name": "mlpal-memory",
+  "version": "0.1.1",
+  "description": "One memory across your coding tools: the MLPal memory MCP server, the session protocol skill, and an opt-in hook that loads the repo's workspace note at session start.",
+  "keywords": [
+    "mlpal",
+    "memory",
+    "mcp",
+    "context",
+    "codex",
+    "claude-code"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./codex.mcp.json",
+  "hooks": "./hooks/codex-hooks.json",
+  "interface": {
+    "displayName": "MLPal memory",
+    "shortDescription": "One memory across your coding tools, written and read as you.",
+    "developerName": "MLPal",
+    "category": "Developer Tools",
+    "websiteUrl": "https://mlpal.ai"
+  }
+}

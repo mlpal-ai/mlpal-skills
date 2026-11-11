@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "mlpal-memory": {
+      "type": "http",
+      "url": "https://memory.mlpal.ai/mcp",
+      "http_headers_helper": "mlpal memory headers --tool codex"
+    }
+  }
+}

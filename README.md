@@ -33,7 +33,7 @@ cp -r mlpal-skills/plugins/mlpal/skills/mlpal-gateway ~/.claude/skills/
 
 Every skill is a plain folder with a `SKILL.md` file (YAML front matter plus Markdown), in the open Agent Skills format. Any harness that reads skills can use it:
 
-- **OpenAI Codex CLI:** copy the folder into `~/.codex/skills/`.
+- **OpenAI Codex:** `codex plugin marketplace add mlpal-ai/mlpal-skills`, then `codex plugin add <plugin>@mlpal` (or `/plugins`); a copied skill folder goes under `~/.agents/skills/`.
 - **yodex and the MLPal harness:** copy it into `.yodex/skills/` in your project, or install the plugin.
 - **Cursor, Windsurf, Cline, Continue and others:** add the `SKILL.md` content to the agent's rules or context file, or point the agent at the file.
 - **Your own agent:** load `SKILL.md` into the system prompt when a request matches its `description`.
