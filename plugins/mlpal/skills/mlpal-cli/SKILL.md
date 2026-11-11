@@ -198,9 +198,9 @@ These follow the same pattern; check `--help` on each:
 - `projects`
 - `metrics`
 - `static-agents` (alias `sa`): create, deploy and talk to static agents
+- `schedules`: run a HOP on a timetable (`create`, `list`, `runs`, `run-now`, `pause`, `resume`, `delete`). All your schedules together may plan a limited number of runs a day; `mlpal schedules settings [--runs-per-day N]` shows and changes it (0.9.5+). A scheduled run is billed like any other: if you are an assistant running the CLI for someone, show them the `create` or `run-now` command and let them confirm. A CLI older than 0.9.6 lists `schedules` under "Closed for now"; it is open.
 
 Closed for now (listed under that heading in `mlpal --help`):
-- `schedules`: run a HOP on a timetable. Not open yet.
 - `sites`: invite-only. `mlpal sites access` says whether it is open for the account; `mlpal sites waitlist` asks for an invite (0.9.0+).
 
 Retired in 0.9.0 (each prints its replacement and exits 2):
