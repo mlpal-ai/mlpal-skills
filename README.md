@@ -45,7 +45,7 @@ Every skill is a plain folder with a `SKILL.md` file (YAML front matter plus Mar
 - An API key, either from **Dashboard → Assistants → API keys** or from the CLI:
 
   ```bash
-  pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ mlpal-cli
+  pip install mlpal-cli            # from PyPI
   mlpal login                      # opens the browser; on a headless machine it prints a link and a code
   mlpal assistants keys create --name my-app --env-file .env --env-var MLPAL_API_KEY
   ```

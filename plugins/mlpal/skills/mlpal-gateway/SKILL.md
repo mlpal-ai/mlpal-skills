@@ -24,7 +24,7 @@ Dashboard: **Assistants → Keys → Create key**. Or with the CLI (0.8.4), whic
 writes the key straight into an env file and never shows it:
 
 ```bash
-uv tool install --index https://pypi.mlpal.ai/simple/ --default-index https://pypi.org/simple/ mlpal-cli
+uv tool install mlpal-cli
 mlpal assistants keys create --name my-agent --env-file .env --env-var MLPAL_API_KEY
 ```
 
@@ -229,7 +229,9 @@ with client.messages.stream(model="claude-haiku-5-5", max_tokens=256,
 ## 5. The official Python SDK (`mlpal-assistants`)
 
 ```bash
-pip install --index-url https://pypi.mlpal.ai/simple/ --extra-index-url https://pypi.org/simple/ "mlpal-assistants>=0.4.0"
+# pip: use the MLPal index as the only index. pip doesn't rank indexes; it takes the
+# highest version from any of them. The MLPal index passes other names through to PyPI.
+pip install --index-url https://pypi.mlpal.ai/simple/ "mlpal-assistants>=0.4.0"
 # with uv (its extra index would outrank the MLPal index and pick an older PyPI release):
 uv pip install --index https://pypi.mlpal.ai/simple/ "mlpal-assistants>=0.4.0"
 ```
